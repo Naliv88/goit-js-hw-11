@@ -1,81 +1,50 @@
 import './css/styles.css';
-import { fetchCountries } from "./scripts/fetchCountries.js"
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
+import axios from 'axios';
+import { createMarkup } from './scripts/markup';
 
-const DEBOUNCE_DELAY = 500;
+// Описаний в документації
+import SimpleLightbox from "simplelightbox";
+// Додатковий імпорт стилів
+import "simplelightbox/dist/simple-lightbox.min.css";
 
-const inputRef = document.querySelector("#search-box");
-const ulRef = document.querySelector(".country-list");
-const divRef = document.querySelector(".country-info");
+const formRef = document.querySelector(".search-form");
+const inputRef = document.querySelector(".search-input");
+const btnRef = document.querySelector(".search-btn");
+const galleryRef = document.querySelector(".gallery");
 
-inputRef.addEventListener("input", debounce(eventInput, DEBOUNCE_DELAY));
+const KEY = "31288013-ac62dc6ecdfb8f972f302b190";
+// ?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40
 
-function eventInput(event) {
+let pageCounter = 1
 
-  event.preventDefault();
-  clearHTML();
+formRef.addEventListener('submit', getUser);
 
-  if (!event.target.value == "") {
-        fetchCountries(event.target.value.trim())
-        .then(renderCard)
-        .catch((err) => {
-          Notify.failure('Oops, there is no country with that name');
-        });
-    };
+async function getUser(event) {
+    event.preventDefault();
+    console.log(inputRef.value);
+    const search = inputRef.value.trim().toLowerCase();
+  try {
+    const response = await axios.get(`https://pixabay.com/api/?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&q=${search}&image_type=photo`);
+      const html =response.data.hits.map(photo => createMarkup(photo)).join("");
+      galleryRef.innerHTML = html;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-function renderCard(data) {
+axios.get('/user?ID=12345')
+  .then(function (response) {
+    // handle success
+    console.log(response);
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
 
-  clearHTML();
+// user_id:31288013
+// https://pixabay.com/api/?key={ KEY }&q=yellow+flowers&image_type=photo
 
-  if (data.length === 1) {
-    // divRef.innerHTML = data.map(country => divCard(country)).join('');
-    divRef.innerHTML = divCard(data[0]);
-  };
-  
-  if (data.length >= 2 && data.length < 10) {
-    ulRef.innerHTML = data.map(country =>  ulListCard(country)).join('');
-  };
-  
-  if (data.length >= 10) {
-    moreTenCard();    
-  };
-    
-}
 
-function ulListCard({flags, name}) {
-    return `
-    <li class="list--item">
-      <img class="list--flags" src="${flags.svg}" alt="flag ${name.official}" width="25" />
-      <h2 class="">${name.official}</h2>
-    </li>`;
-};
-
-function divCard({
-    flags,
-    name,
-    capital,
-    population,
-    languages,
-}) {
-    return `
-      <div class="info--container">
-        <div class="info--wrapper">
-          <img class="info--flags" src="${flags.svg}" alt="flag ${name.official}" width="50" />
-          <h2 class="">${name.official}</h2>
-        </div>
-        <p class=""><span class="">Capital:</span> ${capital}</p>
-        <p class=""><span class="">Population:</span> ${population}</p>
-        <p class=""><span class="">Languages:</span> ${Object.values(languages)}</p>
-      </div>`;
-  };
-
-function moreTenCard() {
-    Notify.info("Too many matches found. Please enter a more specific name.")
-};
-
-function clearHTML() {
-  ulRef.innerHTML = '';
-  divRef.innerHTML = '';
-}

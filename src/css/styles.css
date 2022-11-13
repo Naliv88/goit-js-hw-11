@@ -18,29 +18,3 @@ body {
   max-width: 320px;
   margin-bottom: 16px;
 }
-
-.list--item{
-  display: flex;
-  align-items: center;
-  text-align: center;
-}
-
-.list--flags{
-  width: 30px;
-  height: 20px;
-  margin-right: 10px;
-}
-
-.info--container{
-margin-left: 40px;
-}
-
-.info--wrapper{
-display: flex;
-align-items: center;
-font-size: 30px;
-}
-
-.info--flags{
-  margin-right: 10px;
-}
