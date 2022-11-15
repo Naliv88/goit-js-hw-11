@@ -8,21 +8,20 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const formRef = document.querySelector(".search-form");
 const inputRef = document.querySelector(".search-input");
-const btnRef = document.querySelector(".search-btn");
 const galleryRef = document.querySelector(".gallery");
 const loadMoreRef = document.querySelector(".load-more");
 
-// const lightbox = new SimpleLightbox('.gallery a');
-const search = inputRef.value.trim();
+const lightbox = new SimpleLightbox('.gallery a');
 
 loadMoreRef.addEventListener('click', onLoadClick);
 formRef.addEventListener('submit', submitClick);
 
 let oldSearch = "";
 let newSearch = "";
+let pageCounter = 1;
 
 if (oldSearch ===""||newSearch !== oldSearch){
-  let pageCounter = 1;
+  pageCounter = 1;
   loadMoreRef.classList.add("hidden");
 };
 
@@ -37,6 +36,7 @@ async function submitClick(event) {
   
     const html = response.hits.map(photo => createMarkup(photo)).join("");
     galleryRef.innerHTML = html;
+    lightbox.refresh();
     loadMoreRef.classList.remove("hidden");
     oldSearch = newSearch;
     
@@ -51,9 +51,9 @@ async function onLoadClick() {
   const response = await getPhotos(oldSearch, pageCounter);
   console.log(response);
   const { hits, totalHits } = response;
-  const markup = hits.map(item => createMarkup(item)).join('');
+  const markup = hits.map(photo => createMarkup(photo)).join('');
   galleryRef.insertAdjacentHTML('beforeend', markup);
-  // lightbox.refresh();
+  lightbox.refresh();
   const amountOfPages = totalHits / 40 - pageCounter;
   if (amountOfPages < 1) {
     loadMoreRef.classList.add('hidden');

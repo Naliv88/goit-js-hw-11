@@ -1,3 +1,9 @@
+:root {
+ 
+  --items: 5;
+  --indent: 20px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -19,6 +25,21 @@ body {
   margin-bottom: 16px;
 }
 
+/* .photo-card{
+  width: 30%;
+} */
+
 .hidden {
   display: none;
+}
+
+.card-set {
+  display: flex;
+  flex-wrap: wrap;
+  margin: calc(-1 * var(--indent) / 2);
+}
+
+.card-set-item {
+  flex-basis: calc((100% - (var(--indent))*var(--items))/var(--items));
+  margin: calc(var(--indent) / 2);
 }
