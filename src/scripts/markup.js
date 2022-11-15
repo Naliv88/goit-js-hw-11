@@ -9,8 +9,7 @@ export function createMarkup(photos) {
     downloads,
   } = photos;
   return `<div class="photo-card">
-  <a class="photo-card__link" href="${largeImageURL}">
-  <img class="photo-card__image" src="${webformatURL}" alt="${tags}" loading="lazy"/></a>
+  <a class="photo-card__link" href="${largeImageURL}"><img class="photo-card__image" src="${webformatURL}" alt="${tags}" loading="lazy"/></a>
   <div class="info">
     <p class="info-item">
       <b>Likes</b>

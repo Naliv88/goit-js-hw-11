@@ -1,48 +1,65 @@
 import './css/styles.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import debounce from 'lodash.debounce';
-import axios from 'axios';
+import {getPhotos} from './scripts/getPhotos'
 import { createMarkup } from './scripts/markup';
 
-// Описаний в документації
 import SimpleLightbox from "simplelightbox";
-// Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const formRef = document.querySelector(".search-form");
 const inputRef = document.querySelector(".search-input");
 const btnRef = document.querySelector(".search-btn");
 const galleryRef = document.querySelector(".gallery");
+const loadMoreRef = document.querySelector(".load-more");
 
-const KEY = "31288013-ac62dc6ecdfb8f972f302b190";
-// ?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40
+// const lightbox = new SimpleLightbox('.gallery a');
+const search = inputRef.value.trim();
 
-let pageCounter = 1
+loadMoreRef.addEventListener('click', onLoadClick);
+formRef.addEventListener('submit', submitClick);
 
-formRef.addEventListener('submit', getUser);
+let oldSearch = "";
+let newSearch = "";
 
-async function getUser(event) {
-    event.preventDefault();
-    console.log(inputRef.value);
-    const search = inputRef.value.trim().toLowerCase();
+if (oldSearch ===""||newSearch !== oldSearch){
+  let pageCounter = 1;
+  loadMoreRef.classList.add("hidden");
+};
+
+async function submitClick(event) {
+  event.preventDefault();
+  newSearch = event.currentTarget.elements.searchQuery.value; 
+  pageCounter = 1;
+  
+  console.log(newSearch);
   try {
-    const response = await axios.get(`https://pixabay.com/api/?key=${KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&q=${search}&image_type=photo`);
-      const html =response.data.hits.map(photo => createMarkup(photo)).join("");
-      galleryRef.innerHTML = html;
+    const response = await getPhotos(newSearch, pageCounter);
+  
+    const html = response.hits.map(photo => createMarkup(photo)).join("");
+    galleryRef.innerHTML = html;
+    loadMoreRef.classList.remove("hidden");
+    oldSearch = newSearch;
+    
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
 
-axios.get('/user?ID=12345')
-  .then(function (response) {
-    // handle success
-    console.log(response);
-  })
-  .catch(function (error) {
-    // handle error
-    console.log(error);
-  })
+async function onLoadClick() {
+  
+  pageCounter += 1;
+  const response = await getPhotos(oldSearch, pageCounter);
+  console.log(response);
+  const { hits, totalHits } = response;
+  const markup = hits.map(item => createMarkup(item)).join('');
+  galleryRef.insertAdjacentHTML('beforeend', markup);
+  // lightbox.refresh();
+  const amountOfPages = totalHits / 40 - pageCounter;
+  if (amountOfPages < 1) {
+    loadMoreRef.classList.add('hidden');
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
+}
 
 // user_id:31288013
 // https://pixabay.com/api/?key={ KEY }&q=yellow+flowers&image_type=photo
