@@ -2,6 +2,7 @@ import './css/styles.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import {getPhotos} from './scripts/getPhotos'
 import { createMarkup } from './scripts/markup';
+import { scrollLess } from './scripts/scroll';
 
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
@@ -15,6 +16,7 @@ const lightbox = new SimpleLightbox('.gallery a');
 
 loadMoreRef.addEventListener('click', onLoadClick);
 formRef.addEventListener('submit', submitClick);
+window.addEventListener("scroll", scrollMore);
 
 let oldSearch = "";
 let newSearch = "";
@@ -36,6 +38,7 @@ async function submitClick(event) {
   
     const html = response.hits.map(photo => createMarkup(photo)).join("");
     galleryRef.innerHTML = html;
+    scrollLess();
     lightbox.refresh();
     loadMoreRef.classList.remove("hidden");
     oldSearch = newSearch;
@@ -61,7 +64,18 @@ async function onLoadClick() {
   }
 }
 
+function scrollMore() {
+  const block = document.querySelector('.gallery');
+  if((window.pageYOffset + window.innerHeight) >= block.offsetHeight){
+    onLoadClick();
+  }
+}
+
+
 // user_id:31288013
 // https://pixabay.com/api/?key={ KEY }&q=yellow+flowers&image_type=photo
+
+
+
 
 
