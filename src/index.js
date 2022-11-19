@@ -8,7 +8,6 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const formRef = document.querySelector(".search-form");
-const inputRef = document.querySelector(".search-input");
 const galleryRef = document.querySelector(".gallery");
 const loadMoreRef = document.querySelector(".load-more");
 
@@ -38,7 +37,7 @@ async function submitClick(event) {
   
     const html = response.hits.map(photo => createMarkup(photo)).join("");
     galleryRef.innerHTML = html;
-    scrollLess();
+    // scrollLess();
     lightbox.refresh();
     loadMoreRef.classList.remove("hidden");
     oldSearch = newSearch;
@@ -61,15 +60,15 @@ async function onLoadClick() {
   if (amountOfPages < 1) {
     loadMoreRef.classList.add('hidden');
     Notify.info("We're sorry, but you've reached the end of search results.");
-  }
-}
+  };
+};
 
 function scrollMore() {
   const block = document.querySelector('.gallery');
   if((window.pageYOffset + window.innerHeight) >= block.offsetHeight){
     onLoadClick();
-  }
-}
+  };
+};
 
 
 // user_id:31288013
